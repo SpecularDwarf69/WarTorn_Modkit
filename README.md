@@ -1,19 +1,23 @@
 # WarTorn ModKit
 
-This repository is a clean `UE 4.27` mirror project for building `War-Torn` mods.
+This repo is the working home for `War-Torn` modding in `UE 4.27`.
 
-It is not the extracted game project. The files under `War-Torn_decomp` are cooked runtime assets and metadata. Use those cooked files for reference, discovery, and reverse-engineering. Build new content in this project.
+It is meant to be the editable side of the workflow: the place where you build maps, vehicle experiments, and Blueprint logic mods. The unpacked game files under `War-Torn_decomp` are still important, but they are best treated as reference material. They are cooked game assets, not a friendly source project.
+
+If you want the actual mod-making workflow after setup, start with [Docs/ModMaking.md](Docs/ModMaking.md).
 
 ## What This Repo Is For
 
-- opening a safe editable `UE 4.27` project
-- cooking and repacking test mods
-- deploying Blueprint logic mods into the live game
-- keeping notes, helper scripts, and reverse-engineering findings in one place
+Use this project when you want to:
 
-If you want the actual mod-making workflow, read [Docs/ModMaking.md](Docs/ModMaking.md).
+- open a safe editable `UE 4.27` project
+- cook and repack test mods
+- deploy Blueprint logic mods into the live game
+- keep reverse-engineering notes, helper scripts, and experiments together
 
-## Requirements
+## What You Need Installed
+
+You do not need every tool open all the time, but this is the core stack:
 
 - `Unreal Engine 4.27`
 - `FModel`
@@ -22,26 +26,26 @@ If you want the actual mod-making workflow, read [Docs/ModMaking.md](Docs/ModMak
 - `UnrealPak.exe`
 - the extracted or installed `War-Torn` game files
 
-Local paths used by the helper scripts by default:
+The helper scripts currently assume this default engine path:
 
 - Engine root: `C:\EpicGames_games\UE_4.27`
-- UE4SS root: `C:\Tools\UE4SS_v3.0.1`
-- Game root: `C:\Users\ukuto\Desktop\Projects\War-Torn_decomp\War-Torn_Remastered.v35.9\WarTorn`
 
-If your paths differ, pass them explicitly to the scripts with `-EngineRoot`, `-UE4SSRoot`, `-GameRoot`, or `-GameWin64Dir`.
+Other paths should be passed in explicitly or supplied through environment variables. That keeps this repo portable and avoids baking personal machine paths into versioned files.
 
 ## Repo Layout
 
+The folders you will touch most are:
+
 - `Content`
-  - editable Unreal assets for maps, vehicles, and Blueprint mods
+  - your editable Unreal assets for maps, vehicles, and Blueprint mods
 - `Deploy`
   - mod-specific deployment templates such as `LogicMods/<ModName>/config.lua`
 - `Docs`
-  - setup notes, reverse-engineering notes, and modding guides
+  - setup notes, findings, and workflow guides
 - `LoosePak`
-  - loose-file staging area for manual pak builds
+  - a loose-file staging area for manual pak experiments
 - `Scripts`
-  - helper scripts for editor launch, cooking, repacking, deployment, and log watching
+  - helper scripts for opening the editor, cooking, repacking, deploying, and log watching
 
 ## First-Time Setup
 
@@ -65,19 +69,14 @@ Point the installer at the live game's `Binaries\Win64` folder:
 
 ```powershell
 & ".\Scripts\Install-UE4SS.ps1" `
-  -GameWin64Dir "C:\Users\ukuto\Desktop\Projects\War-Torn_decomp\War-Torn_Remastered.v35.9\WarTorn\Binaries\Win64"
+  -GameWin64Dir "D:\Games\WarTorn\WarTorn\Binaries\Win64"
 ```
 
-This copies:
+That copies the UE4SS runtime files and the bundled mod folder into the game so you can inspect actors, read logs, and load Blueprint logic mods.
 
-- `UE4SS.dll`
-- `dwmapi.dll`
-- `UE4SS-settings.ini`
-- the UE4SS `Mods` folder
+### 3. Check that the runtime hooks are alive
 
-### 3. Verify the runtime hooks
-
-Open a second PowerShell window and watch the live logs:
+Open a second PowerShell window and watch the game logs:
 
 ```powershell
 & ".\Scripts\Watch-GameLogs.ps1"
@@ -87,9 +86,15 @@ Then:
 
 1. Launch `WarTorn-Win64-Shipping.exe`
 2. load into a real map
-3. confirm new lines appear in `UE4SS.log`
+3. make sure new lines appear in `UE4SS.log`
 
-Useful runtime helper keys:
+If you do not want to pass `-GameRoot` every time, set an environment variable first:
+
+```powershell
+$env:WARTORN_GAME_ROOT = "D:\Games\WarTorn\WarTorn"
+```
+
+Useful hotkeys while testing:
 
 - `Insert` reloads Blueprint logic mods
 - `Ctrl+F4` writes a class-count snapshot
@@ -97,11 +102,11 @@ Useful runtime helper keys:
 - `Ctrl+F6` writes deeper component and movement info
 - `Ctrl+F7` inspects the actor under your crosshair
 
-See [Docs/UE4SS-FirstRun.md](Docs/UE4SS-FirstRun.md) for more context.
+If you want the longer version of that process, read [Docs/UE4SS-FirstRun.md](Docs/UE4SS-FirstRun.md).
 
-### 4. Build and deploy the first Blueprint logic mod
+### 4. Build and deploy the first test mod
 
-The included starter test mod is `WTSpawnTest`.
+The starter Blueprint logic mod in this repo is `WTSpawnTest`. Its job is simple: prove that your cooked pak loads into the live game and that your `ModActor` actually runs.
 
 Cook the project:
 
@@ -121,9 +126,9 @@ Deploy it into the game's `Content\Paks\LogicMods` folder:
 & ".\Scripts\Deploy-BPLogicMod.ps1" -ModName WTSpawnTest -CopyConfig
 ```
 
-See [Docs/WTSpawnTest-Guide.md](Docs/WTSpawnTest-Guide.md) for the full walkthrough.
+For the full walkthrough, use [Docs/WTSpawnTest-Guide.md](Docs/WTSpawnTest-Guide.md).
 
-## Common Commands
+## Quick Commands
 
 Open the editor:
 
@@ -161,7 +166,7 @@ Watch runtime logs:
 & ".\Scripts\Watch-GameLogs.ps1"
 ```
 
-## Existing Reference Docs
+## Other Docs
 
 - [Docs/ModMaking.md](Docs/ModMaking.md)
 - [Docs/WarTorn-Reference.md](Docs/WarTorn-Reference.md)
@@ -169,9 +174,11 @@ Watch runtime logs:
 - [Docs/UE4SS-FirstRun.md](Docs/UE4SS-FirstRun.md)
 - [Docs/WTSpawnTest-Guide.md](Docs/WTSpawnTest-Guide.md)
 
-## Important Limits
+## Reality Check
 
-- New maps must exist on the server and all clients.
-- New drivable vehicles are harder than maps because they depend on replicated gameplay logic, seat setup, wheel setup, and runtime spawn/control paths.
-- Cooked game assets are reference material, not a full editable source project.
-- A safe first vehicle target is a variant of the existing car framework, not a fully original vehicle from zero.
+A few constraints are worth keeping in mind from the start:
+
+- New maps have to exist on the server and on every client.
+- New drivable vehicles are much harder than maps because they depend on replicated gameplay logic, seat setup, wheel setup, and runtime spawn/control paths.
+- The extracted game files are reference material, not a complete editable source project.
+- The safest first vehicle target is a variant of the existing car framework, not a fully original vehicle from scratch.

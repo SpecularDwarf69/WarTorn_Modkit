@@ -10,12 +10,12 @@ Goal:
 
 ## Files involved
 
-- Project: `C:\Users\ukuto\Desktop\Projects\WarTorn_ModKit\WarTorn_ModKit.uproject`
-- Deploy script: `C:\Users\ukuto\Desktop\Projects\WarTorn_ModKit\Scripts\Deploy-BPLogicMod.ps1`
-- Log watcher: `C:\Users\ukuto\Desktop\Projects\WarTorn_ModKit\Scripts\Watch-GameLogs.ps1`
-- Repack script: `C:\Users\ukuto\Desktop\Projects\WarTorn_ModKit\Scripts\Repack-BPLogicMod.ps1`
-- Config template: `C:\Users\ukuto\Desktop\Projects\WarTorn_ModKit\Deploy\LogicMods\WTSpawnTest\config.lua`
-- Game LogicMods folder: `C:\Users\ukuto\Desktop\Projects\War-Torn_decomp\War-Torn_Remastered.v35.9\WarTorn\Content\Paks\LogicMods`
+- Project: `<repo-root>\WarTorn_ModKit.uproject`
+- Deploy script: `<repo-root>\Scripts\Deploy-BPLogicMod.ps1`
+- Log watcher: `<repo-root>\Scripts\Watch-GameLogs.ps1`
+- Repack script: `<repo-root>\Scripts\Repack-BPLogicMod.ps1`
+- Config template: `<repo-root>\Deploy\LogicMods\WTSpawnTest\config.lua`
+- Game LogicMods folder: `<game-root>\Content\Paks\LogicMods`
 
 ## What BPModLoader expects
 

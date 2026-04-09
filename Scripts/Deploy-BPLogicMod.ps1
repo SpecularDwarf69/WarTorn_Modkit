@@ -3,11 +3,20 @@ param(
     [string]$ModName = "WTSpawnTest",
     [string]$PakPath = "",
     [string]$CookRoot = "",
-    [string]$GameRoot = "C:\Users\ukuto\Desktop\Projects\War-Torn_decomp\War-Torn_Remastered.v35.9\WarTorn",
+    [string]$GameRoot = "",
     [switch]$CopyConfig
 )
 
 $projectRoot = Split-Path -Parent $PSScriptRoot
+
+if ([string]::IsNullOrWhiteSpace($GameRoot)) {
+    $GameRoot = $env:WARTORN_GAME_ROOT
+}
+
+if ([string]::IsNullOrWhiteSpace($GameRoot)) {
+    throw "GameRoot is not set. Pass -GameRoot or set the WARTORN_GAME_ROOT environment variable."
+}
+
 $logicModsRoot = Join-Path $GameRoot "Content\Paks\LogicMods"
 
 if (-not (Test-Path -LiteralPath $logicModsRoot)) {

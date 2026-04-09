@@ -2,7 +2,7 @@
 
 Source dump:
 
-- `C:\Users\ukuto\Desktop\Projects\War-Torn_decomp\War-Torn_Remastered.v35.9\WarTorn\Binaries\Win64\ActorDump.txt`
+- `<game-root>\Binaries\Win64\ActorDump.txt`
 
 ## Dump sessions observed
 

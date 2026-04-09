@@ -1,10 +1,18 @@
 [CmdletBinding()]
 param(
-    [string]$GameRoot = "C:\Users\ukuto\Desktop\Projects\War-Torn_decomp\War-Torn_Remastered.v35.9\WarTorn",
+    [string]$GameRoot = "",
     [int]$Tail = 30,
     [int]$PollMilliseconds = 1000,
     [switch]$IncludeActorDump
 )
+
+if ([string]::IsNullOrWhiteSpace($GameRoot)) {
+    $GameRoot = $env:WARTORN_GAME_ROOT
+}
+
+if ([string]::IsNullOrWhiteSpace($GameRoot)) {
+    throw "GameRoot is not set. Pass -GameRoot or set the WARTORN_GAME_ROOT environment variable."
+}
 
 $targets = @(
     @{

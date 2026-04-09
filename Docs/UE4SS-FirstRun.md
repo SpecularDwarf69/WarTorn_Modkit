@@ -2,7 +2,7 @@
 
 UE4SS has been installed to:
 
-- `C:\Users\ukuto\Desktop\Projects\War-Torn_decomp\War-Torn_Remastered.v35.9\WarTorn\Binaries\Win64`
+- `<game-root>\Binaries\Win64`
 
 ## Enabled mods
 
