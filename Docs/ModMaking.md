@@ -12,7 +12,7 @@ In this project, there are three realistic kinds of mods:
 2. `Blueprint logic mods` loaded through `BPModLoader`
 3. `Vehicle content mods`
 
-They overlap, but they are not the same problem.
+You can combine them in one mod, but each one has a different workflow and different technical blockers.
 
 ## 1. Map Mods
 

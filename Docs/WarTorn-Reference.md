@@ -58,5 +58,4 @@ This note captures the most useful paths found in the extracted game data.
 
 - Maps are mostly world geometry plus placed gameplay blueprints.
 - Vehicles use the UE4 PhysXVehicles stack, not Chaos Vehicles as the primary runtime path.
-- The easiest first vehicle mod is a sedan derivative, not a completely new class.
 - Runtime-spawned drivable or flyable actors appear to reuse the same `VehicleComponent` and `VehicleSeat` gameplay framework.
