@@ -217,3 +217,15 @@ The repo makes more sense as a reference base than anything else. If you do keep
 
 
 ## NB! A bunch of code was written or improved by AI, the dumps and some other stuff was also written and analyzed by AI.
+
+# License
+
+Unless a file says otherwise, the original code, scripts, docs, and original project files in this repo are licensed under `GPL-3.0-only`.
+
+That is intentional. If someone builds on the original work from this repo and distributes the result, I want that work to stay open-source too.
+
+Important notice:
+
+- this applies to the stuff I made and can license (so most of the repo)
+- it does not grant rights to `War-Torn`, its trademarks, or any extracted/cooked third-party game content
+- extracted game files are still reference material, not mine to relicense
