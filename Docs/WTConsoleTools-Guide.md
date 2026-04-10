@@ -35,7 +35,7 @@ These are the commands I would actually trust using:
 - `wt_probe_console_path`
 - `wt_probe_vehicle_funcs`
 - `wt_probe_live_car [index]`
-- `wt_load_bpmod <ModName> [AssetPath] [AssetClass]`
+- `wt_load_bpmod <ModName> [AssetPath] [AssetClass]` (is kindof disabled)
 - `wt_last_bpmod`
 
 ## What is intentionally limited
@@ -113,7 +113,7 @@ If you want to actually load or reload Blueprint logic mods, use:
 
 ## Vehicle tracing workflow
 
-If you want to learn how the stock vehicle path works without crashing the game, this is the loop I would use:
+If you want to learn how the stock vehicle path works without crashing the game, this is the loop I would use (doesn't really give that useful info for me):
 
 1. `wt_trace_exec on`
 2. perform the stock action you care about
