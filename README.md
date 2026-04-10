@@ -6,6 +6,8 @@ The decompiled game files are still useful, but they are cooked game content and
 
 If you just want the practical modding workflow, start with [Docs/ModMaking.md](Docs/ModMaking.md).
 
+The game and download is [here]((https://kingoftheend.itch.io/war-torn))
+
 ## Project Status
 
 This repo is very likely abandoned now.
