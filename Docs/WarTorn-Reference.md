@@ -1,6 +1,6 @@
 # War-Torn Reference
 
-This is the short reference sheet I keep coming back to while working in the repo.
+This is the short reference sheet to keep coming back to while working in the repo.
 
 It is not a full reverse-engineering dump. It is just the set of paths and classes that keep being useful.
 
@@ -32,7 +32,6 @@ These are the maps I would copy from before I started guessing:
 - `/Game/Maps/Qarya/Qarya`
 - `/Game/Maps/QaryaObj`
 - `/Game/Maps/ShootingRange/Range`
-- `/Game/Maps/TestMaps/Test/Dev`
 
 ## Vehicle assets
 
@@ -64,7 +63,7 @@ These are the maps I would copy from before I started guessing:
 - vehicles are using the PhysX vehicle stack here, not a simple prop workflow
 - runtime drivable/flyable actors appear to share the same seat and vehicle component framework
 
-If I need more context than this sheet gives me, I usually jump to:
+If you need more context than this sheet gives you, go to:
 
 - [ActorDump-Analysis.md](ActorDump-Analysis.md)
 - `UE4SS.log`
