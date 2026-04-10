@@ -221,3 +221,6 @@ If somebody else ends up continuing this, this is where I would start:
 5. leave vehicle spawning and deeper runtime hooks for last
 
 The repo makes more sense as a reference base than as a finished framework. If you do keep going with it, I think the best approach is to tighten one path at a time instead of trying to "fix the whole modkit" in one swing.
+
+
+NB! A bunch of code was written or improved by AI, the dumps and some other stuff was also written and analyzed by AI.
