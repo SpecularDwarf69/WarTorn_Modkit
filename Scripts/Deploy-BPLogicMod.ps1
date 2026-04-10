@@ -7,66 +7,78 @@ param(
     [switch]$CopyConfig
 )
 
+function Resolve-GameRoot {
+    param([string]$RequestedRoot)
+
+    if (-not [string]::IsNullOrWhiteSpace($RequestedRoot)) {
+        return $RequestedRoot
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($env:WARTORN_GAME_ROOT)) {
+        return $env:WARTORN_GAME_ROOT
+    }
+
+    throw "GameRoot is not set. Pass -GameRoot or set WARTORN_GAME_ROOT first."
+}
+
+function Resolve-PakPath {
+    param(
+        [string]$RequestedPakPath,
+        [string]$ModName,
+        [string]$ProjectRoot,
+        [string]$CookRoot
+    )
+
+    if (-not [string]::IsNullOrWhiteSpace($RequestedPakPath)) {
+        if (-not (Test-Path -LiteralPath $RequestedPakPath)) {
+            throw "Pak file not found: $RequestedPakPath"
+        }
+
+        return $RequestedPakPath
+    }
+
+    $preferredPak = Join-Path $ProjectRoot ("Build\Paks\" + $ModName + ".pak")
+    if (Test-Path -LiteralPath $preferredPak) {
+        return $preferredPak
+    }
+
+    $latestCookedPak = Get-ChildItem -LiteralPath $CookRoot -Recurse -Filter *.pak -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+
+    if (-not $latestCookedPak) {
+        throw "Could not find a cooked pak under: $CookRoot"
+    }
+
+    return $latestCookedPak.FullName
+}
+
 $projectRoot = Split-Path -Parent $PSScriptRoot
-
-if ([string]::IsNullOrWhiteSpace($GameRoot)) {
-    $GameRoot = $env:WARTORN_GAME_ROOT
-}
-
-if ([string]::IsNullOrWhiteSpace($GameRoot)) {
-    throw "GameRoot is not set. Pass -GameRoot or set the WARTORN_GAME_ROOT environment variable."
-}
-
-$logicModsRoot = Join-Path $GameRoot "Content\Paks\LogicMods"
-
-if (-not (Test-Path -LiteralPath $logicModsRoot)) {
-    $null = New-Item -ItemType Directory -Force -Path $logicModsRoot
-}
+$resolvedGameRoot = Resolve-GameRoot -RequestedRoot $GameRoot
 
 if ([string]::IsNullOrWhiteSpace($CookRoot)) {
     $CookRoot = Join-Path $projectRoot "Build\Cooked"
 }
 
-if ([string]::IsNullOrWhiteSpace($PakPath)) {
-    $preferredPak = Join-Path $projectRoot ("Build\Paks\" + $ModName + ".pak")
-    if (Test-Path -LiteralPath $preferredPak) {
-        $PakPath = $preferredPak
-    }
-}
+$logicModsRoot = Join-Path $resolvedGameRoot "Content\Paks\LogicMods"
+$null = New-Item -ItemType Directory -Force -Path $logicModsRoot
 
-if ([string]::IsNullOrWhiteSpace($PakPath)) {
-    $candidate = Get-ChildItem -LiteralPath $CookRoot -Recurse -Filter *.pak -ErrorAction SilentlyContinue |
-        Sort-Object LastWriteTime -Descending |
-        Select-Object -First 1
+$resolvedPakPath = Resolve-PakPath -RequestedPakPath $PakPath -ModName $ModName -ProjectRoot $projectRoot -CookRoot $CookRoot
+$targetPakPath = Join-Path $logicModsRoot ($ModName + ".pak")
 
-    if (-not $candidate) {
-        throw "No cooked pak found under: $CookRoot"
-    }
-
-    $PakPath = $candidate.FullName
-}
-
-if (-not (Test-Path -LiteralPath $PakPath)) {
-    throw "Pak file not found: $PakPath"
-}
-
-$targetPak = Join-Path $logicModsRoot ($ModName + ".pak")
-Copy-Item -LiteralPath $PakPath -Destination $targetPak -Force
-
-$configSource = Join-Path $projectRoot ("Deploy\LogicMods\" + $ModName + "\config.lua")
-$configTargetDir = Join-Path $logicModsRoot $ModName
-$configTarget = Join-Path $configTargetDir "config.lua"
+Copy-Item -LiteralPath $resolvedPakPath -Destination $targetPakPath -Force
+Write-Host "Copied pak to $targetPakPath"
 
 if ($CopyConfig) {
+    $configSource = Join-Path $projectRoot ("Deploy\LogicMods\" + $ModName + "\config.lua")
     if (-not (Test-Path -LiteralPath $configSource)) {
-        throw "Config template not found: $configSource"
+        throw "Could not find config template: $configSource"
     }
+
+    $configTargetDir = Join-Path $logicModsRoot $ModName
+    $configTarget = Join-Path $configTargetDir "config.lua"
 
     $null = New-Item -ItemType Directory -Force -Path $configTargetDir
     Copy-Item -LiteralPath $configSource -Destination $configTarget -Force
-}
-
-Write-Host "Deployed pak: $targetPak"
-if ($CopyConfig) {
-    Write-Host "Deployed config: $configTarget"
+    Write-Host "Copied config to $configTarget"
 }

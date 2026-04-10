@@ -5,42 +5,42 @@ param(
     [string]$PakName = "WarTorn_Mod_P.pak"
 )
 
-$projectRoot = Split-Path -Parent $PSScriptRoot
-$unrealPak = Join-Path $EngineRoot "Engine\Binaries\Win64\UnrealPak.exe"
+$repoDir = Split-Path -Parent $PSScriptRoot
+$unrealPakExe = Join-Path $EngineRoot "Engine\Binaries\Win64\UnrealPak.exe"
 
-if (-not (Test-Path -LiteralPath $unrealPak)) {
-    throw "UnrealPak.exe not found: $unrealPak"
+if (-not (Test-Path -LiteralPath $unrealPakExe)) {
+    throw "Could not find UnrealPak.exe: $unrealPakExe"
 }
 
 if ([string]::IsNullOrWhiteSpace($LooseRoot)) {
-    $LooseRoot = Join-Path $projectRoot "LoosePak"
+    $LooseRoot = Join-Path $repoDir "LoosePak"
 }
 
-$warTornRoot = Join-Path $LooseRoot "WarTorn"
-
-if (-not (Test-Path -LiteralPath $warTornRoot)) {
-    throw "Loose pak root not found: $warTornRoot"
+$warTornLooseRoot = Join-Path $LooseRoot "WarTorn"
+if (-not (Test-Path -LiteralPath $warTornLooseRoot)) {
+    throw "Could not find the staged loose pak folder: $warTornLooseRoot"
 }
 
-$pakDir = Join-Path $projectRoot "Build\Paks"
-$responseDir = Join-Path $projectRoot "Build\ResponseFiles"
-$null = New-Item -ItemType Directory -Force -Path $pakDir, $responseDir
+$pakOutputDir = Join-Path $repoDir "Build\Paks"
+$responseDir = Join-Path $repoDir "Build\ResponseFiles"
+$null = New-Item -ItemType Directory -Force -Path $pakOutputDir, $responseDir
 
 $responseFile = Join-Path $responseDir "WarTorn_Mod_Response.txt"
-$pakPath = Join-Path $pakDir $PakName
-$files = Get-ChildItem -LiteralPath $warTornRoot -Recurse -File
+$pakOutputPath = Join-Path $pakOutputDir $PakName
+$stagedFiles = Get-ChildItem -LiteralPath $warTornLooseRoot -Recurse -File
 
-if ($files.Count -eq 0) {
-    throw "No staged files found under: $warTornRoot"
+if ($stagedFiles.Count -eq 0) {
+    throw "There are no staged files under: $warTornLooseRoot"
 }
 
-$lines = foreach ($file in $files) {
-    $relative = $file.FullName.Substring($LooseRoot.Length).TrimStart('\')
-    $mountPoint = "../../../" + ($relative -replace "\\", "/")
-    """$($file.FullName)"" ""$mountPoint"""
+$responseLines = foreach ($file in $stagedFiles) {
+    $relativePath = $file.FullName.Substring($LooseRoot.Length).TrimStart('\')
+    $mountPath = "../../../" + ($relativePath -replace "\\", "/")
+    """$($file.FullName)"" ""$mountPath"""
 }
 
-Set-Content -LiteralPath $responseFile -Value $lines -Encoding ascii
+Set-Content -LiteralPath $responseFile -Value $responseLines -Encoding ASCII
 
-& $unrealPak $pakPath "-Create=$responseFile" "-compress"
+Write-Host "Packing loose files into $pakOutputPath..."
+& $unrealPakExe $pakOutputPath "-Create=$responseFile" "-compress"
 exit $LASTEXITCODE

@@ -1,61 +1,71 @@
 # War-Torn Reference
 
-This note captures the most useful paths found in the extracted game data.
+This is the short reference sheet I keep coming back to while working in the repo.
+
+It is not a full reverse-engineering dump. It is just the set of paths and classes that keep being useful.
 
 ## Project defaults
 
-- Game instance: `/Game/Blueprints/Player/WTGameInstance.WTGameInstance_C`
-- Default menu map: `/Game/Maps/MainMenu.MainMenu`
-- Default server map: `/Game/Maps/Qarya/Qarya.Qarya`
-- Default game mode: `/Game/Blueprints/Player/FirstPersonGameMode.FirstPersonGameMode_C`
+- game instance: `/Game/Blueprints/Player/WTGameInstance.WTGameInstance_C`
+- default menu map: `/Game/Maps/MainMenu.MainMenu`
+- default server map: `/Game/Maps/Qarya/Qarya.Qarya`
+- default game mode: `/Game/Blueprints/Player/FirstPersonGameMode.FirstPersonGameMode_C`
 
-## Key map gameplay actors
+## Map-side gameplay actors
 
-- Player spawn: `/Game/Blueprints/Player/Spawn`
+- player spawn: `/Game/Blueprints/Player/Spawn`
 - Battle Royale loot spawn: `/Game/Blueprints/Items/BattleRoyale/BattleRoyaleLootSpawn`
-- Bomb spawn: `/Game/Blueprints/Items/Bomb/BombSpawn`
-- CTF flag spawns: `/Game/Blueprints/Items/CTF/FlagSpawn1` and `/Game/Blueprints/Items/CTF/FlagSpawn2`
-- CTF dropoffs: `/Game/Blueprints/Items/CTF/FlagDropOff1` and `/Game/Blueprints/Items/CTF/FlagDropOff2`
-- Objective spawn: `/Game/Blueprints/Items/Objective/ObjectiveSpawn`
-- Spawn walls: `/Game/Blueprints/Items/MasterItems/SpawnWalls`
-- Static turret spawn helper: `/Game/Maps/StaticTurretSpawn`
-- Weather manager: `/Game/Maps/BP_WeatherManager`
+- bomb spawn: `/Game/Blueprints/Items/Bomb/BombSpawn`
+- CTF flag spawn 1: `/Game/Blueprints/Items/CTF/FlagSpawn1`
+- CTF flag spawn 2: `/Game/Blueprints/Items/CTF/FlagSpawn2`
+- CTF dropoff 1: `/Game/Blueprints/Items/CTF/FlagDropOff1`
+- CTF dropoff 2: `/Game/Blueprints/Items/CTF/FlagDropOff2`
+- objective spawn: `/Game/Blueprints/Items/Objective/ObjectiveSpawn`
+- spawn walls: `/Game/Blueprints/Items/MasterItems/SpawnWalls`
+- static turret spawn helper: `/Game/Maps/StaticTurretSpawn`
+- weather manager: `/Game/Maps/BP_WeatherManager`
 
-## Map structure clues
+## Useful stock map references
 
-- Maps commonly contain `PlayerStart`, `NavMeshBoundsVolume`, `RecastNavMesh`, `Landscape`, and mode-specific blueprint actors.
-- Useful reference maps:
-  - `/Game/Maps/Qarya/Qarya`
-  - `/Game/Maps/QaryaObj`
-  - `/Game/Maps/ShootingRange/Range`
-  - `/Game/Maps/TestMaps/Test/Dev`
+These are the maps I would copy from before I started guessing:
+
+- `/Game/Maps/Qarya/Qarya`
+- `/Game/Maps/QaryaObj`
+- `/Game/Maps/ShootingRange/Range`
+- `/Game/Maps/TestMaps/Test/Dev`
 
 ## Vehicle assets
 
-- Main vehicle blueprint: `/Game/Blueprints/Vehicles/Car`
-- Vehicle component: `/Game/Blueprints/Vehicles/VehicleComponent`
-- Vehicle interface: `/Game/Blueprints/Vehicles/VehicleInterface`
-- Vehicle seat: `/Game/Blueprints/Vehicles/VehicleSeat`
-- Front wheel: `/Game/Blueprints/Vehicles/Vehicle_FrontWheel`
-- Back wheel: `/Game/Blueprints/Vehicles/Vehicle_BackWheel`
-- Tire data: `/Game/Blueprints/Vehicles/TireData`
-- Turret base: `/Game/Blueprints/Vehicles/Turrets/Turret`
+- main vehicle blueprint: `/Game/Blueprints/Vehicles/Car`
+- vehicle component: `/Game/Blueprints/Vehicles/VehicleComponent`
+- vehicle interface: `/Game/Blueprints/Vehicles/VehicleInterface`
+- vehicle seat struct: `/Game/Blueprints/Vehicles/VehicleSeat`
+- front wheel: `/Game/Blueprints/Vehicles/Vehicle_FrontWheel`
+- back wheel: `/Game/Blueprints/Vehicles/Vehicle_BackWheel`
+- tire data: `/Game/Blueprints/Vehicles/TireData`
+- turret base: `/Game/Blueprints/Vehicles/Turrets/Turret`
 
 ## Flying assets
 
-- Flying pawn: `/Game/FlyingBP/Blueprints/FlyingPawn`
-- Plane support blueprint: `/Game/Blueprints/Guns/FireSupports/PlaneSupport`
+- flying pawn: `/Game/FlyingBP/Blueprints/FlyingPawn`
+- plane support blueprint: `/Game/Blueprints/Guns/FireSupports/PlaneSupport`
 
 ## Sedan reference assets
 
-- Skeletal mesh: `/Game/VehicleBP/Sedan/Sedan/Sedan_SkelMesh`
-- Skeleton: `/Game/VehicleBP/Sedan/Sedan/Sedan_Skeleton`
-- Physics asset: `/Game/VehicleBP/Sedan/Sedan/Sedan_PhysicsAsset`
-- Physical material: `/Game/VehicleBP/Sedan/Sedan/Sedan_PhysMat`
-- Anim BP: `/Game/VehicleBP/Sedan/Sedan/Sedan_AnimBP`
+- skeletal mesh: `/Game/VehicleBP/Sedan/Sedan/Sedan_SkelMesh`
+- skeleton: `/Game/VehicleBP/Sedan/Sedan/Sedan_Skeleton`
+- physics asset: `/Game/VehicleBP/Sedan/Sedan/Sedan_PhysicsAsset`
+- physical material: `/Game/VehicleBP/Sedan/Sedan/Sedan_PhysMat`
+- anim BP: `/Game/VehicleBP/Sedan/Sedan/Sedan_AnimBP`
 
-## Practical interpretation
+## Practical takeaways
 
-- Maps are mostly world geometry plus placed gameplay blueprints.
-- Vehicles use the UE4 PhysXVehicles stack, not Chaos Vehicles as the primary runtime path.
-- Runtime-spawned drivable or flyable actors appear to reuse the same `VehicleComponent` and `VehicleSeat` gameplay framework.
+- maps are mostly world geometry plus placed gameplay blueprints
+- vehicles are using the PhysX vehicle stack here, not a simple prop workflow
+- runtime drivable/flyable actors appear to share the same seat and vehicle component framework
+
+If I need more context than this sheet gives me, I usually jump to:
+
+- [ActorDump-Analysis.md](ActorDump-Analysis.md)
+- `UE4SS.log`
+- the extracted assets in `War-Torn_decomp`

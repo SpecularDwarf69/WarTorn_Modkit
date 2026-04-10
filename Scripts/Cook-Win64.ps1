@@ -6,25 +6,25 @@ param(
     [string]$ArchiveDir = ""
 )
 
-$projectRoot = Split-Path -Parent $PSScriptRoot
-$uproject = Join-Path $projectRoot "WarTorn_ModKit.uproject"
-$uat = Join-Path $EngineRoot "Engine\Build\BatchFiles\RunUAT.bat"
+$repoDir = Split-Path -Parent $PSScriptRoot
+$projectFile = Join-Path $repoDir "WarTorn_ModKit.uproject"
+$uatBat = Join-Path $EngineRoot "Engine\Build\BatchFiles\RunUAT.bat"
 
-if (-not (Test-Path -LiteralPath $uproject)) {
-    throw "Project file not found: $uproject"
+if (-not (Test-Path -LiteralPath $projectFile)) {
+    throw "Could not find the project file: $projectFile"
 }
 
-if (-not (Test-Path -LiteralPath $uat)) {
-    throw "RunUAT.bat not found: $uat"
+if (-not (Test-Path -LiteralPath $uatBat)) {
+    throw "Could not find RunUAT.bat: $uatBat"
 }
 
 if ([string]::IsNullOrWhiteSpace($ArchiveDir)) {
-    $ArchiveDir = Join-Path $projectRoot "Build\Cooked"
+    $ArchiveDir = Join-Path $repoDir "Build\Cooked"
 }
 
-$args = @(
+$uatArgs = @(
     "BuildCookRun",
-    "-project=$uproject",
+    "-project=$projectFile",
     "-noP4",
     "-platform=Win64",
     "-clientconfig=$Configuration",
@@ -37,8 +37,9 @@ $args = @(
 )
 
 if ($Maps.Count -gt 0) {
-    $args += "-map=$($Maps -join '+')"
+    $uatArgs += "-map=$($Maps -join '+')"
 }
 
-& $uat @args
+Write-Host "Cooking WarTorn_ModKit for Win64..."
+& $uatBat @uatArgs
 exit $LASTEXITCODE

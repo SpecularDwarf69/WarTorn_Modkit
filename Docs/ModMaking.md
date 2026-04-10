@@ -1,24 +1,49 @@
 # Mod Making Guide
 
-This guide is the practical workflow for making `War-Torn` mods with this repo.
+This is the "what should I actually make first?" guide for the repo.
 
-Use [../README.md](../README.md) for install and setup. Use this document once the toolchain is already working.
+Use [../README.md](../README.md) for setup. Use this file once the editor, UE4SS, and the live game are already talking to each other.
 
-## The Three Mod Types
+## Maintenance Note
 
-In this project, there are three realistic kinds of mods:
+This repo is probably not getting active development anymore.
 
-1. `Map content mods`
-2. `Blueprint logic mods` loaded through `BPModLoader`
-3. `Vehicle content mods`
+The notes are still useful, and I think the project is still a decent starting point if you want to continue the work, but you should assume some parts are incomplete, experimental, or just frozen in whatever state I last left them in.
 
-You can combine them in one mod, but each one has a different workflow and different technical blockers.
+## The Three Lanes
 
-## 1. Map Mods
+There are really three modding lanes in this project:
+
+1. map content
+2. Blueprint logic mods through `BPModLoader`
+3. vehicle content
+
+They can overlap, but they are not equally hard.
+
+If you want the least painful path, start with maps and Blueprint logic. Leave vehicles for later.
+
+## What Is Actually Working Well
+
+At the moment, the most reliable workflow is:
+
+- make or edit a map in the Unreal project
+- cook and repack it
+- use `WTSpawnTest` or another Blueprint logic mod to prove runtime behavior
+- use UE4SS helpers for inspection and debugging
+
+That is enough for stuff like:
+
+- test maps
+- training ranges
+- simple scenario setups
+- debug helpers
+- light custom rule logic
+
+## Map Mods
 
 ### What a War-Torn map seems to need
 
-From the live dumps and extracted references, real maps are not just geometry. They rely on placed gameplay actors such as:
+Real maps are more than geometry. From the live dumps and extracted references, they tend to rely on actors like:
 
 - `PlayerStart`
 - `Spawn_C`
@@ -27,161 +52,155 @@ From the live dumps and extracted references, real maps are not just geometry. T
 - `ObjectiveSpawn_C`
 - `SpawnWalls_C`
 - `StaticTurretSpawn_C`
-- optional weather, AI, loot, or target spawners
 
-Reference notes:
+Useful companion notes:
 
 - [WarTorn-Reference.md](WarTorn-Reference.md)
 - [ActorDump-Analysis.md](ActorDump-Analysis.md)
 
-### Good first map target
+### Good first target
 
-Start with a small test or training map, not a full production battlefield.
+Do not start with a giant battlefield. Start with a test range or a small blockout map.
 
-Recommended first goals:
+If your first map has:
 
-- one valid `PlayerStart`
-- one valid `Spawn_C` equivalent setup
-- navmesh that builds correctly
-- simple terrain or blockout geometry
-- one or two test props or mounted weapons
+- one valid player spawn
+- working navmesh
+- a couple of gameplay actors
+- a clean cook/deploy/test loop
+
+that is already a win.
 
 ### Suggested workflow
 
-1. Build or block out the level in `Content/Maps/WT_TestRange`.
-2. Copy the actor pattern of `Range` instead of guessing.
+1. Build the level under `Content/Maps`.
+2. Copy patterns from `Range` or another stock map instead of inventing actor layouts from scratch.
 3. Cook with `Scripts/Cook-Win64.ps1`.
-4. If you need a manual patch pak, stage files under `LoosePak/WarTorn/...` and run `Scripts/Pack-LoosePak.ps1`.
-5. Test in the live game with log watching enabled.
+4. If needed, build a manual patch pak from `LoosePak`.
+5. Test in the live game with logs open.
 
-## 2. Blueprint Logic Mods
+## Blueprint Logic Mods
 
-`BPModLoader` gives you a way to inject runtime Blueprint logic without replacing the entire game.
+This is the easiest way to add runtime behavior without replacing the game's whole flow.
 
-### Required asset layout
+### Expected asset layout
 
-If your mod pak is named `WTSpawnTest.pak`, `BPModLoader` expects:
+If your pak is named `WTSpawnTest.pak`, `BPModLoader` expects:
 
 - asset path: `/Game/Mods/WTSpawnTest/ModActor`
 - generated class: `ModActor_C`
 
-That means the asset should live in:
+So the matching editor asset lives at:
 
 - `Content/Mods/WTSpawnTest/ModActor`
 
-### Starter workflow
+### Why this path matters
 
-The included starter mod is `WTSpawnTest`.
+Blueprint logic mods are the bridge between static cooked content and runtime behavior.
 
-Use it to prove:
+They are good for:
 
-- your cooked pak mounts
-- `BPModLoader` finds the Blueprint
-- `PreBeginPlay` runs
-- `PostBeginPlay` runs
+- map-side helper logic
+- debug output
+- world detection
+- lightweight rule changes
+- experiments that do not need native code
 
-Detailed walkthrough:
+The included starter mod is documented here:
 
 - [WTSpawnTest-Guide.md](WTSpawnTest-Guide.md)
 
-### Why this matters
+### Important reality check
 
-Blueprint logic mods are the easiest way to bridge the gap between:
+Manual runtime spawning of Blueprint logic actors through helper commands is unstable right now. The safe path is still:
 
-- map content you build in the editor
-- runtime actors that War-Torn normally spawns by command or game logic
+- cook the mod
+- let `BPModLoader` load it normally
+- use `Insert` if you need to reload logic mods in a live session
 
-This is especially useful for:
+## Vehicle Mods
 
-- map-side helper spawning
-- debugging the current world
-- vehicle experiments
-- inspecting live actor classes
+This is the hardest lane in the repo right now.
 
-## 3. Vehicle Mods
+### What the stock car tells us
 
-### What we know about the stock car
+Live inspection showed the drivable car is tied into:
 
-Live inspection showed the stock drivable car is:
+- `Car_C`
+- `WheeledVehicleMovementComponent4W`
+- `VehicleComponent_C`
+- seat data
+- turret child actors
+- server-authoritative gameplay logic
 
-- class: `/Game/Blueprints/Vehicles/Car.Car_C`
-- based on `WheeledVehicleMovementComponent4W`
-- using `VehicleComponent_C`
-- using seat data and a turret child actor
-- replicated as server-authoritative gameplay logic
+So a drivable vehicle is not just:
 
-That means a drivable vehicle is more than a mesh swap. It needs:
+- a mesh swap
+- four wheels
+- a new Blueprint dropped into the game
 
-- a skeletal mesh
-- wheel bones
-- a physics asset
-- wheel blueprints
-- a vehicle blueprint
-- seat and control logic
-- a valid runtime spawn path
+### Best first vehicle target
 
-### Easiest vehicle path
-
-The safest first vehicle mod is a `car derivative`, not a fully new system.
+Treat the stock car as the framework and build from there.
 
 Recommended order:
 
-1. reuse the stock car framework
-2. replace or adapt the visible mesh
-3. keep the stock wheel and seat logic at first
-4. only then move toward full custom handling
+1. reuse the stock car setup
+2. swap or adapt the visible mesh
+3. keep the existing seat and movement logic as long as possible
+4. only then start pushing toward a more original vehicle
 
-### Using Fab vehicles
+### Using Fab or other donor assets
 
-If you use a Fab vehicle pack, treat it as a `donor asset pack`, not a drop-in War-Torn gameplay system.
+Donor vehicle packs are best treated as art sources, not ready-made gameplay systems.
 
-Best use of a Fab vehicle:
+Use them for:
 
-- import its skeletal mesh
-- inspect its skeleton and wheel placement
-- reuse or adapt its art and rig
-- rebuild the gameplay side around War-Torn's existing car framework
+- skeletal meshes
+- wheel placement reference
+- art direction
+- rigging reference
 
-Do not assume the donor pack's own vehicle Blueprint logic will match War-Torn's runtime systems.
+Do not expect their Blueprint gameplay logic to drop straight into War-Torn.
 
-### Using Blender
+### Static prop versus drivable vehicle
 
-If you are preparing a custom drivable car in Blender, the working pattern is:
+This distinction matters:
 
-- one root/chassis bone
-- four wheel bones centered in the wheel hubs
-- all wheel bones parented to the root
-- body weighted to the root
-- each wheel weighted to its own wheel bone
+- static prop vehicle
+  - easy
+  - fine for scenery or set dressing
+- drivable vehicle
+  - much harder
+  - depends on runtime systems we are still tracing
 
-For `UE 4.27`, export the rigged vehicle as `FBX`, then import it into Unreal as a `Skeletal Mesh`.
-
-### Static mesh props versus drivable vehicles
-
-A parked prop car and a drivable car are different things.
-
-- `Static mesh prop`
-  - easy to place in maps
-  - no wheel bones
-  - no vehicle movement
-- `Drivable vehicle`
-  - requires the full skeletal vehicle pipeline
-  - requires runtime logic compatibility
-
-If you only want scenery, a static mesh prop is enough. If you want real driving, build for the drivable path from the start.
+If you only need a parked truck or car wreck, do not overbuild it.
 
 ## Recommended Development Order
 
-If you are starting from zero, this is the least painful sequence:
+If you are starting from scratch, this order is the least frustrating:
 
-1. confirm UE4SS and `WTSpawnTest` still work
-2. make a tiny map edit or test map
-3. make a simple prop or static placement mod
-4. clone the stock car workflow
-5. swap in a new donor vehicle mesh
-6. only after that try a full custom vehicle
+1. get UE4SS working
+2. get `WTSpawnTest` loading cleanly
+3. make a tiny map edit or a small test map
+4. place props or simple gameplay actors
+5. add Blueprint helper logic
+6. only then start touching vehicles
 
-## Repo Folders You Will Touch Most
+## If You Are Picking This Up Later
+
+My honest advice is: do not go straight for the flashy stuff.
+
+There is enough here to be useful, but the stable parts and unstable parts are mixed together. If you want to keep building on it, these are probably the safest priorities:
+
+1. keep the editor project healthy
+2. keep the cook and repack flow repeatable
+3. keep BP mod loading simple and observable
+4. use live vehicle inspection as reference, not as proof that runtime spawning is solved
+
+If you treat this repo like a reference-heavy sandbox instead of a finished SDK, it makes a lot more sense.
+
+## Folders You Will Actually Touch
 
 - `Content/Maps`
 - `Content/Mods`
@@ -190,7 +209,7 @@ If you are starting from zero, this is the least painful sequence:
 - `Scripts`
 - `Docs`
 
-## Useful Companion Docs
+## Companion Docs
 
 - [WarTorn-Reference.md](WarTorn-Reference.md)
 - [ActorDump-Analysis.md](ActorDump-Analysis.md)

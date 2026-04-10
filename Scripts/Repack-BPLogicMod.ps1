@@ -6,11 +6,11 @@ param(
     [string]$PakName = ""
 )
 
-$projectRoot = Split-Path -Parent $PSScriptRoot
+$repoDir = Split-Path -Parent $PSScriptRoot
 
 if ([string]::IsNullOrWhiteSpace($CookRoot)) {
-    $savedCookRoot = Join-Path $projectRoot "Saved\Cooked\WindowsNoEditor\$ProjectCookName"
-    $archivedCookRoot = Join-Path $projectRoot "Build\Cooked\WindowsNoEditor\$ProjectCookName"
+    $savedCookRoot = Join-Path $repoDir "Saved\Cooked\WindowsNoEditor\$ProjectCookName"
+    $archivedCookRoot = Join-Path $repoDir "Build\Cooked\WindowsNoEditor\$ProjectCookName"
 
     if (Test-Path -LiteralPath $savedCookRoot) {
         $CookRoot = $savedCookRoot
@@ -23,35 +23,35 @@ if ([string]::IsNullOrWhiteSpace($PakName)) {
     $PakName = "$ModName.pak"
 }
 
-$contentSource = Join-Path $CookRoot "Content\Mods\$ModName"
-$assetRegistrySource = Join-Path $CookRoot "AssetRegistry.bin"
+$cookedModContent = Join-Path $CookRoot "Content\Mods\$ModName"
+$cookedAssetRegistry = Join-Path $CookRoot "AssetRegistry.bin"
 
-if (-not (Test-Path -LiteralPath $contentSource)) {
-    throw "Cooked mod content not found: $contentSource"
+if (-not (Test-Path -LiteralPath $cookedModContent)) {
+    throw "Could not find cooked mod content: $cookedModContent"
 }
 
-if (-not (Test-Path -LiteralPath $assetRegistrySource)) {
-    throw "Cooked AssetRegistry.bin not found: $assetRegistrySource"
+if (-not (Test-Path -LiteralPath $cookedAssetRegistry)) {
+    throw "Could not find cooked AssetRegistry.bin: $cookedAssetRegistry"
 }
 
-$looseRoot = Join-Path $projectRoot "Build\LoosePak\$ModName"
+$looseRoot = Join-Path $repoDir "Build\LoosePak\$ModName"
 $warTornRoot = Join-Path $looseRoot "WarTorn"
-$contentTarget = Join-Path $warTornRoot "Content\Mods\$ModName"
-$modsTargetRoot = Join-Path $warTornRoot "Content\Mods"
+$modsRoot = Join-Path $warTornRoot "Content\Mods"
 $assetRegistryTarget = Join-Path $warTornRoot "AssetRegistry.bin"
 
 if (Test-Path -LiteralPath $looseRoot) {
     Remove-Item -LiteralPath $looseRoot -Recurse -Force
 }
 
-$null = New-Item -ItemType Directory -Force -Path $modsTargetRoot
-Copy-Item -LiteralPath $assetRegistrySource -Destination $assetRegistryTarget -Force
-Copy-Item -LiteralPath $contentSource -Destination $modsTargetRoot -Recurse -Force
+$null = New-Item -ItemType Directory -Force -Path $modsRoot
+Copy-Item -LiteralPath $cookedAssetRegistry -Destination $assetRegistryTarget -Force
+Copy-Item -LiteralPath $cookedModContent -Destination $modsRoot -Recurse -Force
 
-$packScript = Join-Path $projectRoot "Scripts\Pack-LoosePak.ps1"
+$packScript = Join-Path $repoDir "Scripts\Pack-LoosePak.ps1"
 if (-not (Test-Path -LiteralPath $packScript)) {
-    throw "Pack-LoosePak.ps1 not found: $packScript"
+    throw "Could not find Pack-LoosePak.ps1: $packScript"
 }
 
+Write-Host "Repacking $ModName so it mounts under WarTorn/..."
 & $packScript -LooseRoot $looseRoot -PakName $PakName
 exit $LASTEXITCODE

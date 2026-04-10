@@ -1,55 +1,47 @@
 # WTSpawnTest Guide
 
-This is the first Blueprint mod to build in the mirror project.
+`WTSpawnTest` is the tiny smoke-test Blueprint mod that ships with this repo.
 
-Goal:
+It is not meant to be impressive at all. Its whole job is to answer one question: "Does the cooked Blueprint logic mod path still work on this setup?"
 
-- prove that BPModLoader loads your cooked pak
-- prove that a custom Blueprint actor can run code in the live game
-- establish the path `/Game/Mods/WTSpawnTest/ModActor`
+## What it proves
+
+If `WTSpawnTest` works, you know:
+
+- your cook step worked
+- the repacked mod mounts under the right path
+- `BPModLoader` found the asset
+- the `ModActor` made it into the live world
+- your Blueprint logic is actually running
+
+For a very small mod, it clears up a surprising amount of uncertainty.
 
 ## Files involved
 
-- Project: `<repo-root>\WarTorn_ModKit.uproject`
-- Deploy script: `<repo-root>\Scripts\Deploy-BPLogicMod.ps1`
-- Log watcher: `<repo-root>\Scripts\Watch-GameLogs.ps1`
-- Repack script: `<repo-root>\Scripts\Repack-BPLogicMod.ps1`
-- Config template: `<repo-root>\Deploy\LogicMods\WTSpawnTest\config.lua`
-- Game LogicMods folder: `<game-root>\Content\Paks\LogicMods`
+- project: `<repo-root>\WarTorn_ModKit.uproject`
+- deploy script: `<repo-root>\Scripts\Deploy-BPLogicMod.ps1`
+- repack script: `<repo-root>\Scripts\Repack-BPLogicMod.ps1`
+- log watcher: `<repo-root>\Scripts\Watch-GameLogs.ps1`
+- config template: `<repo-root>\Deploy\LogicMods\WTSpawnTest\config.lua`
+- live game folder: `<game-root>\Content\Paks\LogicMods`
 
-## What BPModLoader expects
+## Expected asset path
 
-BPModLoader will load any `.pak` placed in `Content\Paks\LogicMods`.
+If the pak is named `WTSpawnTest.pak`, `BPModLoader` will look for:
 
-If the pak is named `WTSpawnTest.pak`, it will look for this Blueprint by default:
+- asset path: `/Game/Mods/WTSpawnTest/ModActor`
+- generated class: `ModActor_C`
 
-- Asset path: `/Game/Mods/WTSpawnTest/ModActor`
-- Generated class name: `ModActor_C`
+So in the editor, the asset should be:
 
-That means the `config.lua` file is helpful but not strictly required as long as you follow the default naming convention.
-
-BPModLoader then:
-
-- spawns your `ModActor`
-- calls `PreBeginPlay()` manually if it exists
-- waits for normal BeginPlay
-- calls `PostBeginPlay()` if it exists
-
-There is also a manual reload key:
-
-- `Insert` reloads Blueprint logic mods
+- `Content/Mods/WTSpawnTest/ModActor`
 
 ## In the editor
 
 1. Open the project with `Scripts\Open-Editor.ps1`.
-2. In the Content Browser, create folder `Mods`.
-3. Inside `Mods`, create folder `WTSpawnTest`.
-4. Inside `WTSpawnTest`, create a Blueprint Class based on `Actor`.
-5. Name it `ModActor`.
-
-The final asset path must be:
-
-- `/Game/Mods/WTSpawnTest/ModActor`
+2. Create `Content/Mods/WTSpawnTest` if it does not already exist.
+3. Create a Blueprint Class based on `Actor`.
+4. Name it `ModActor`.
 
 ## Blueprint setup
 
@@ -58,43 +50,34 @@ Create two Blueprint functions on `ModActor`:
 - `PreBeginPlay`
 - `PostBeginPlay`
 
-BPModLoader looks for those names specifically.
+`BPModLoader` looks for those exact names.
 
-### `PreBeginPlay`
+### Suggested `PreBeginPlay`
 
-Put these nodes in `PreBeginPlay`:
-
-1. `Print String`
-2. Text: `WTSpawnTest PreBeginPlay`
-3. Duration: `10`
-
-### `PostBeginPlay`
-
-Put these nodes in `PostBeginPlay`:
+Keep it simple:
 
 1. `Print String`
-2. Text: `WTSpawnTest PostBeginPlay`
-3. Duration: `10`
+2. text: `WTSpawnTest PreBeginPlay`
+3. duration: `10`
 
-Optional extra nodes in `PostBeginPlay`:
+### Suggested `PostBeginPlay`
 
-1. `Get Display Name`
-2. `Self`
-3. `Print String`
+Again, keep it obvious and boring:
 
-That gives you a visible confirmation that the mod actor exists in the game world.
+1. `Print String`
+2. text: `WTSpawnTest PostBeginPlay`
+3. duration: `10`
 
-Recommended first graph:
+If you want one extra confirmation, add:
 
-1. Add a `Print String` with `WTSpawnTest PostBeginPlay`.
-2. Add `Get Current Level Name`.
-3. Add another `Print String` that includes the level name.
+1. `Get Current Level Name`
+2. `Print String`
 
-This makes it obvious that the Blueprint loaded in the live game and tells you which map it attached to.
+That way you know the mod loaded and which map it attached to without having to guess.
 
 ## Cook
 
-From the project root:
+From the repo root:
 
 ```powershell
 & ".\Scripts\Cook-Win64.ps1"
@@ -102,8 +85,7 @@ From the project root:
 
 ## Repack
 
-The cooked project pak uses the mirror project root name, which the live game does not resolve correctly for BPModLoader.
-Repack the cooked files so they mount under `WarTorn/...` instead:
+The cooked project pak needs to be repacked so it mounts under `WarTorn/...` instead of the mirror project root.
 
 ```powershell
 & ".\Scripts\Repack-BPLogicMod.ps1" -ModName WTSpawnTest
@@ -111,76 +93,53 @@ Repack the cooked files so they mount under `WarTorn/...` instead:
 
 ## Deploy
 
-From the project root:
-
 ```powershell
 & ".\Scripts\Deploy-BPLogicMod.ps1" -ModName WTSpawnTest -CopyConfig
 ```
 
-The script will:
+That script will:
 
-- prefer `Build\Paks\WTSpawnTest.pak` if it exists
-- otherwise find the newest cooked pak under `Build\Cooked`
-- copy it to `WarTorn\Content\Paks\LogicMods\WTSpawnTest.pak`
-- copy the config template to `WarTorn\Content\Paks\LogicMods\WTSpawnTest\config.lua`
+- prefer `Build\Paks\WTSpawnTest.pak` if it already exists
+- otherwise use the newest cooked pak it can find
+- copy it into `WarTorn\Content\Paks\LogicMods\WTSpawnTest.pak`
+- optionally copy the config template too
 
-## Test
+## Test loop
 
-First, in a separate PowerShell window, watch the runtime logs:
+In another PowerShell window:
 
 ```powershell
 & ".\Scripts\Watch-GameLogs.ps1"
 ```
 
-1. Launch the game.
-2. Load into a map.
-3. Look for the `Print String` messages from `PreBeginPlay` and `PostBeginPlay`.
-4. If you want to force a reload after the map is already open, press `Insert`.
-5. If you want a runtime actor count snapshot, press `Ctrl+F4`.
-6. If you want detailed live vehicle info, press `Ctrl+F5`.
-7. If you want deep component and filtered property dumps for live vehicles, press `Ctrl+F6`.
-8. If you want to inspect the exact prop you are looking at, aim at it and press `Ctrl+F7`.
-9. Check `UE4SS.log` and `WTDebugHelper.log` if needed.
+Then:
+
+1. launch the game
+2. load into a real map
+3. look for the `Print String` output from `PreBeginPlay` and `PostBeginPlay`
+4. if you need to reload logic mods in a live session, press `Insert`
+5. check `UE4SS.log` and `WTDebugHelper.log` if the Blueprint output is not obvious
+
+## Useful helper hotkeys while testing
+
+- `Insert`
+  - reload Blueprint logic mods
+- `Ctrl+F4`
+  - class-count snapshot
+- `Ctrl+F5`
+  - detailed live vehicle inspection
+- `Ctrl+F6`
+  - deeper component dump
+- `Ctrl+F7`
+  - inspect the actor under your crosshair
 
 ## After it works
 
-Once this loads correctly, the next upgrade is:
+Once `WTSpawnTest` is reliable, I would not immediately make it bigger. The better next step is to make it more useful:
 
-- add more logging in `PostBeginPlay`
-- detect the current world name
-- start interacting with runtime-spawned actors such as `Car_C` and `FlyingPawn_C`
+- detect the current world
+- log more useful state
+- spawn helper actors from Blueprint
+- prototype simple rules or world-side logic
 
-## WTDebugHelper inspection keys
-
-The runtime helper at `WarTorn\Binaries\Win64\Mods\WTDebugHelper\Scripts\main.lua` now supports:
-
-- `Ctrl+F4` for a quick class count snapshot
-- `Ctrl+F5` for detailed `Car_C` and `FlyingPawn_C` inspection
-- `Ctrl+F6` for deep `VehicleComponent`, movement, turret, health, mesh, and controller-linked subobject dumps
-- `Ctrl+F7` for a look-at inspector that identifies the exact actor and mesh paths of the prop under your crosshair
-
-`Ctrl+F5` writes:
-
-- actor full name
-- class name
-- world name
-- actor address
-- location if a safe getter is available
-- rotation if a safe getter is available
-
-`Ctrl+F6` writes:
-
-- the live actor identity again
-- reflected details for `VehicleComponent`
-- reflected details for movement-related subobjects
-- reflected details for turret and health subobjects
-- filtered vehicle-relevant properties so the log stays readable
-
-`Ctrl+F7` writes:
-
-- the exact actor under your crosshair
-- its class path
-- its world name
-- its transform
-- filtered reflected properties on the actor itself
-- filtered reflected properties on likely mesh-bearing subobjects such as `RootComponent`, `Mesh`, `StaticMeshComponent`, and `SkeletalMeshComponent`
+That is the point where it stops being a smoke test and starts being the base for a real mod.
