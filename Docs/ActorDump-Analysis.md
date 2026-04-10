@@ -1,6 +1,6 @@
 # Actor Dump Analysis
 
-This is basically my notes from looking through `ActorDump.txt`.
+This is basically AI notes from looking through `ActorDump.txt`.
 
 Source file:
 
@@ -8,7 +8,7 @@ Source file:
 
 The dump keeps appending new sessions, so it is easy for it to turn into a mess if you do not keep track of which map you were in.
 
-## Sessions I looked at
+## Sessions that was looked at
 
 - `MainMenu`: 14 actors
 - `ShootingRange/Range`: 826 actors
@@ -16,7 +16,7 @@ The dump keeps appending new sessions, so it is easy for it to turn into a mess 
 
 ## Core stuff that keeps showing up
 
-These were in the playable maps I checked and are probably part of the minimum real level setup:
+These were in the playable maps that were checked and are probably part of the minimum real level setup:
 
 - `WorldSettings`
 - `FirstPersonGameMode_C`
@@ -32,7 +32,7 @@ These were in the playable maps I checked and are probably part of the minimum r
 - `GameNetworkManager`
 - `ParticleEventManager`
 
-What that tells me:
+What that tells:
 
 - playable maps are not just geometry
 - `Spawn_C` matters a lot
@@ -83,7 +83,7 @@ Mounted weapon related classes:
 - `W85Turret_C`
 - `W85TurretGun_C`
 
-My read on it:
+AI's read on it:
 
 - `Range` is pretty blueprint-heavy
 - targets and AI are driven by placed helpers, not just map scripting magic
@@ -158,7 +158,7 @@ That is a much easier target than trying to force a custom car into the game.
 
 Neither `Range` nor `Sauvere` showed obvious placed drivable vehicles in the normal dump.
 
-That lines up with the other thing we kept running into:
+That lines up with the other thing I kept running into:
 
 - the car seems more runtime-spawned than map-placed
 - the vehicle side is more coupled to game logic than static turrets are
@@ -178,8 +178,7 @@ The extracted `FirstPersonPlayerController` data references things like:
 
 That matches what it felt like in testing:
 
-- the car is probably spawned through a command or game path
-- not just placed in the map and left there
+- the car is probably spawned through a command or game path not just placed in the map and left there
 
 Practical takeaway:
 
@@ -198,7 +197,7 @@ In a later `Sauvere` dump where spawned vehicles were present, these showed up:
 - `AIController`
 - `Turret_C`
 
-That tells me:
+That tells:
 
 - the car is definitely a real runtime actor class
 - the plane is its own actor too, not just a prop
