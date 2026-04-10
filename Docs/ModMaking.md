@@ -1,14 +1,12 @@
 # Mod Making Guide
 
-This is the "what should I actually make first?" guide for the repo.
-
 Use [../README.md](../README.md) for setup. Use this file once the editor, UE4SS, and the live game are already talking to each other.
 
 ## Maintenance Note
 
 This repo is probably not getting active development anymore.
 
-The notes are still useful, and I think the project is still a decent starting point if you want to continue the work, but you should assume some parts are incomplete, experimental, or just frozen in whatever state I last left them in.
+The notes are still useful, and I think the project is still a decent starting point if you want to continue the work, but some parts are incomplete, experimental, or just frozen in whatever state I left them in.
 
 ## The Three Lanes
 
@@ -18,7 +16,7 @@ There are really three modding lanes in this project:
 2. Blueprint logic mods through `BPModLoader`
 3. vehicle content
 
-They can overlap, but they are not equally hard.
+They can overlap, but they are hard all have different challenges.
 
 If you want the least painful path, start with maps and Blueprint logic. Leave vehicles for later.
 
@@ -26,7 +24,7 @@ If you want the least painful path, start with maps and Blueprint logic. Leave v
 
 At the moment, the most reliable workflow is:
 
-- make or edit a map in the Unreal project
+- make or edit a map in the Unreal project (haven't done it myself)
 - cook and repack it
 - use `WTSpawnTest` or another Blueprint logic mod to prove runtime behavior
 - use UE4SS helpers for inspection and debugging
@@ -62,14 +60,12 @@ Useful companion notes:
 
 Do not start with a giant battlefield. Start with a test range or a small blockout map.
 
-If your first map has:
+Your first map should have:
 
 - one valid player spawn
 - working navmesh
 - a couple of gameplay actors
 - a clean cook/deploy/test loop
-
-that is already a win.
 
 ### Suggested workflow
 
@@ -81,7 +77,7 @@ that is already a win.
 
 ## Blueprint Logic Mods
 
-This is the easiest way to add runtime behavior without replacing the game's whole flow.
+This is the easiest way to add runtime behavior without replacing the game's logic.
 
 ### Expected asset layout
 
@@ -110,7 +106,7 @@ The included starter mod is documented here:
 
 - [WTSpawnTest-Guide.md](WTSpawnTest-Guide.md)
 
-### Important reality check
+### Important notes
 
 Manual runtime spawning of Blueprint logic actors through helper commands is unstable right now. The safe path is still:
 
@@ -120,9 +116,9 @@ Manual runtime spawning of Blueprint logic actors through helper commands is uns
 
 ## Vehicle Mods
 
-This is the hardest lane in the repo right now.
+This is the hardest type of content in the repo right now.
 
-### What the stock car tells us
+### What the stock car tells
 
 Live inspection showed the drivable car is tied into:
 
@@ -150,19 +146,6 @@ Recommended order:
 3. keep the existing seat and movement logic as long as possible
 4. only then start pushing toward a more original vehicle
 
-### Using Fab or other donor assets
-
-Donor vehicle packs are best treated as art sources, not ready-made gameplay systems.
-
-Use them for:
-
-- skeletal meshes
-- wheel placement reference
-- art direction
-- rigging reference
-
-Do not expect their Blueprint gameplay logic to drop straight into War-Torn.
-
 ### Static prop versus drivable vehicle
 
 This distinction matters:
@@ -172,7 +155,7 @@ This distinction matters:
   - fine for scenery or set dressing
 - drivable vehicle
   - much harder
-  - depends on runtime systems we are still tracing
+  - depends on runtime systems
 
 If you only need a parked truck or car wreck, do not overbuild it.
 
@@ -185,13 +168,13 @@ If you are starting from scratch, this order is the least frustrating:
 3. make a tiny map edit or a small test map
 4. place props or simple gameplay actors
 5. add Blueprint helper logic
-6. only then start touching vehicles
+6. only then start thinking about vehicles
 
 ## If You Are Picking This Up Later
 
-My honest advice is: do not go straight for the flashy stuff.
+My honest advice is: do not go straight for the advanced content.
 
-There is enough here to be useful, but the stable parts and unstable parts are mixed together. If you want to keep building on it, these are probably the safest priorities:
+There is some here to be useful, but the stable parts and unstable parts are mixed together. If you want to keep building on it, these are probably the safest priorities:
 
 1. keep the editor project healthy
 2. keep the cook and repack flow repeatable
