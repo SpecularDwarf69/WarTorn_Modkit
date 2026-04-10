@@ -1,82 +1,96 @@
 # WarTorn ModKit
 
-This repo is the working home for `War-Torn` modding in `UE 4.27`.
+This repo was the editable side of my `War-Torn` modding setup.
 
-It is meant to be the editable side of the workflow: the place where you build maps, vehicle experiments, and Blueprint logic mods. The unpacked game files under `War-Torn_decomp` are still important, but they are best treated as reference material. They are cooked game assets, not a friendly source project.
+The extracted game files in `War-Torn_decomp` are still useful, but they are cooked game content and kind of miserable to treat like a real source project. This repo is the part that was actually meant to be worked in: maps, Blueprint mods, helper scripts, notes, and random UE4SS experiments.
 
-If you want the actual mod-making workflow after setup, start with [Docs/ModMaking.md](Docs/ModMaking.md).
+If you just want the practical modding workflow, start with [Docs/ModMaking.md](Docs/ModMaking.md).
 
-## What This Repo Is For
+## Project Status
 
-Use this project when you want to:
+This repo is very likely abandoned now.
 
-- open a safe editable `UE 4.27` project
-- cook and repack test mods
-- deploy Blueprint logic mods into the live game
-- keep reverse-engineering notes, helper scripts, and experiments together
+I have other stuff to do and I do not really have the interest to keep pushing this project forward. I am leaving it up because there is still some value in it as:
+
+- a reference for War-Torn asset paths, actor layouts, and runtime notes
+- a base for anyone who wants to keep experimenting with maps, Blueprint mods, or UE4SS tooling
+- a record of what already worked, what partly worked, and what turned out to be unstable
+
+So no, I would not treat this like an actively maintained toolkit anymore. But I still think it is useful enough to keep around in case someone wants to pick it up later.
+
+## Current State
+
+Right now this repo is best at:
+
+- map work in an editable `UE 4.27` project
+- cooked Blueprint logic mods loaded through `BPModLoader`
+- reverse-engineering notes pulled from live actor dumps and extracted assets
+- small UE4SS helper mods for debugging and command experiments
+
+What is still rough:
+
+- custom vehicle spawning
+- some console-hook experiments
+- anything that depends on War-Torn's private runtime flow instead of plain cooked content
+
+Short version: maps and Blueprint logic are the parts I would trust the most. Vehicle and runtime tooling is still very much "I was figuring this out as I went."
+
+## What Is In Here
+
+- `Content`
+  - editable Unreal assets for maps, props, Blueprint mods, and experiments
+- `Deploy`
+  - deployment templates for logic mods and UE4SS mods
+- `Docs`
+  - workflow notes, findings, references, and setup guides
+- `LoosePak`
+  - loose-file staging for manual patch pak experiments
+- `Scripts`
+  - PowerShell helpers for opening the editor, cooking, repacking, deploying, and watching logs
 
 ## What You Need Installed
 
-You do not need every tool open all the time, but this is the core stack:
+This is the tool stack the repo expects:
 
 - `Unreal Engine 4.27`
-- `FModel`
-- `UAssetGUI`
 - `UE4SS`
 - `UnrealPak.exe`
-- the extracted or installed `War-Torn` game files
+- `FModel`
+- `UAssetGUI`
+- an installed or extracted copy of `War-Torn`
 
-The helper scripts currently assume this default engine path:
+By default the scripts expect Unreal here:
 
-- Engine root: `C:\EpicGames_games\UE_4.27`
+- `C:\EpicGames_games\UE_4.27`
 
-Other paths should be passed in explicitly or supplied through environment variables. That keeps this repo portable and avoids baking personal machine paths into versioned files.
+If your engine lives somewhere else, most scripts let you pass a path in directly.
 
-## Repo Layout
-
-The folders you will touch most are:
-
-- `Content`
-  - your editable Unreal assets for maps, vehicles, and Blueprint mods
-- `Deploy`
-  - mod-specific deployment templates such as `LogicMods/<ModName>/config.lua`
-- `Docs`
-  - setup notes, findings, and workflow guides
-- `LoosePak`
-  - a loose-file staging area for manual pak experiments
-- `Scripts`
-  - helper scripts for opening the editor, cooking, repacking, deploying, and log watching
-
-## First-Time Setup
+## Quick Start
 
 ### 1. Open the project
-
-From the repo root:
 
 ```powershell
 & ".\Scripts\Open-Editor.ps1"
 ```
 
-If Unreal is installed somewhere else:
+If you need to point at a different engine install:
 
 ```powershell
 & ".\Scripts\Open-Editor.ps1" -EngineRoot "D:\Epic Games\UE_4.27"
 ```
 
-### 2. Install UE4SS into the game
+### 2. Install UE4SS into the live game
 
-Point the installer at the live game's `Binaries\Win64` folder:
+Point the installer at the game's `Binaries\Win64` folder:
 
 ```powershell
 & ".\Scripts\Install-UE4SS.ps1" `
   -GameWin64Dir "D:\Games\WarTorn\WarTorn\Binaries\Win64"
 ```
 
-That copies the UE4SS runtime files and the bundled mod folder into the game so you can inspect actors, read logs, and load Blueprint logic mods.
+### 3. Confirm the runtime hooks are alive
 
-### 3. Check that the runtime hooks are alive
-
-Open a second PowerShell window and watch the game logs:
+In another PowerShell window:
 
 ```powershell
 & ".\Scripts\Watch-GameLogs.ps1"
@@ -85,50 +99,55 @@ Open a second PowerShell window and watch the game logs:
 Then:
 
 1. Launch `WarTorn-Win64-Shipping.exe`
-2. load into a real map
-3. make sure new lines appear in `UE4SS.log`
+2. Load into a real map
+3. Check that `UE4SS.log` starts moving
 
-If you do not want to pass `-GameRoot` every time, set an environment variable first:
+If you do not want to keep passing the game path around, set:
 
 ```powershell
 $env:WARTORN_GAME_ROOT = "D:\Games\WarTorn\WarTorn"
 ```
 
-Useful hotkeys while testing:
+### 4. Build the first test mod
 
-- `Insert` reloads Blueprint logic mods
-- `Ctrl+F4` writes a class-count snapshot
-- `Ctrl+F5` writes detailed live `Car_C` and `FlyingPawn_C` info
-- `Ctrl+F6` writes deeper component and movement info
-- `Ctrl+F7` inspects the actor under your crosshair
+The starter Blueprint logic mod in this repo is `WTSpawnTest`.
 
-If you want the longer version of that process, read [Docs/UE4SS-FirstRun.md](Docs/UE4SS-FirstRun.md).
-
-### 4. Build and deploy the first test mod
-
-The starter Blueprint logic mod in this repo is `WTSpawnTest`. Its job is simple: prove that your cooked pak loads into the live game and that your `ModActor` actually runs.
-
-Cook the project:
+Cook:
 
 ```powershell
 & ".\Scripts\Cook-Win64.ps1"
 ```
 
-Repack the cooked Blueprint logic mod so it mounts under `WarTorn/...`:
+Repack:
 
 ```powershell
 & ".\Scripts\Repack-BPLogicMod.ps1" -ModName WTSpawnTest
 ```
 
-Deploy it into the game's `Content\Paks\LogicMods` folder:
+Deploy:
 
 ```powershell
 & ".\Scripts\Deploy-BPLogicMod.ps1" -ModName WTSpawnTest -CopyConfig
 ```
 
-For the full walkthrough, use [Docs/WTSpawnTest-Guide.md](Docs/WTSpawnTest-Guide.md).
+That is the quickest end-to-end test that proves the editable project, the cook step, and the in-game logic-mod path are all working together.
 
-## Quick Commands
+## Useful Runtime Hotkeys
+
+These come from the bundled helper mods and are handy while testing:
+
+- `Insert`
+  - reload Blueprint logic mods
+- `Ctrl+F4`
+  - class-count snapshot
+- `Ctrl+F5`
+  - live `Car_C` and `FlyingPawn_C` inspection
+- `Ctrl+F6`
+  - deeper vehicle/component dump
+- `Ctrl+F7`
+  - inspect the actor under your crosshair
+
+## Day-To-Day Commands
 
 Open the editor:
 
@@ -142,16 +161,18 @@ Cook the project:
 & ".\Scripts\Cook-Win64.ps1"
 ```
 
-Build a patch pak from `LoosePak`:
+Build a loose patch pak:
 
 ```powershell
 & ".\Scripts\Pack-LoosePak.ps1"
 ```
 
-Repack a Blueprint logic mod:
+Deploy a UE4SS Lua mod from this repo:
 
 ```powershell
-& ".\Scripts\Repack-BPLogicMod.ps1" -ModName WTSpawnTest
+& ".\Scripts\Deploy-UE4SSMod.ps1" `
+  -GameWin64Dir "D:\Games\WarTorn\WarTorn\Binaries\Win64" `
+  -ModName WTConsoleTools
 ```
 
 Deploy a Blueprint logic mod:
@@ -166,19 +187,37 @@ Watch runtime logs:
 & ".\Scripts\Watch-GameLogs.ps1"
 ```
 
-## Other Docs
+## Recommended Reading Order
 
-- [Docs/ModMaking.md](Docs/ModMaking.md)
-- [Docs/WarTorn-Reference.md](Docs/WarTorn-Reference.md)
-- [Docs/ActorDump-Analysis.md](Docs/ActorDump-Analysis.md)
-- [Docs/UE4SS-FirstRun.md](Docs/UE4SS-FirstRun.md)
-- [Docs/WTSpawnTest-Guide.md](Docs/WTSpawnTest-Guide.md)
+If you are new to the repo, this is the order I would actually read things:
 
-## Reality Check
+1. [Docs/ModMaking.md](Docs/ModMaking.md)
+2. [Docs/WTSpawnTest-Guide.md](Docs/WTSpawnTest-Guide.md)
+3. [Docs/UE4SS-FirstRun.md](Docs/UE4SS-FirstRun.md)
+4. [Docs/WarTorn-Reference.md](Docs/WarTorn-Reference.md)
+5. [Docs/ActorDump-Analysis.md](Docs/ActorDump-Analysis.md)
+6. [Docs/WTConsoleTools-Guide.md](Docs/WTConsoleTools-Guide.md)
 
-A few constraints are worth keeping in mind from the start:
+## Honest Notes
 
-- New maps have to exist on the server and on every client.
-- New drivable vehicles are much harder than maps because they depend on replicated gameplay logic, seat setup, wheel setup, and runtime spawn/control paths.
-- The extracted game files are reference material, not a complete editable source project.
-- The safest first vehicle target is a variant of the existing car framework, not a fully original vehicle from scratch.
+A few honest expectations:
+
+- New maps are realistic.
+- Blueprint logic mods are realistic.
+- Vehicle variants are possible, but the runtime side is still messy.
+- A true "brand new game mode" is much harder than it sounds.
+- The extracted game files are reference material, not a complete editable source tree.
+
+This repo can still help someone, but it is not a clean SDK and it definitely is not finished.
+
+## If You Want To Continue It
+
+If somebody else ends up continuing this, this is where I would start:
+
+1. make sure the basic `WTSpawnTest` cook and load path still works
+2. verify the UE4SS helper mods still load cleanly on the current game build
+3. treat the docs in `Docs/` as field notes, not gospel
+4. focus on maps and Blueprint logic first
+5. leave vehicle spawning and deeper runtime hooks for last
+
+The repo makes more sense as a reference base than as a finished framework. If you do keep going with it, I think the best approach is to tighten one path at a time instead of trying to "fix the whole modkit" in one swing.
