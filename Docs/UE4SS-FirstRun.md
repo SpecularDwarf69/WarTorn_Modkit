@@ -10,7 +10,7 @@ The goal is simple: confirm that the runtime is injected, the helper mods are lo
 
 ## Mods that should be enabled
 
-At minimum, these are the ones I expect to see working:
+At minimum, these are the ones you want to see working:
 
 - `ActorDumperMod`
 - `ConsoleCommandsMod`
@@ -49,7 +49,7 @@ You should start seeing actor names that prove the runtime is looking at the liv
 
 ## If nothing happens
 
-Check the boring stuff first:
+Check the this stuff first:
 
 - `mods.txt` really has the mods enabled
 - you are in a loaded level, not the menu
@@ -58,6 +58,6 @@ Check the boring stuff first:
 
 ## Why this matters
 
-This is the fastest way to stop guessing.
+This is the fastest way to test if the install worked.
 
 Once the dump works, you can start comparing stock actor layouts against what you place in the editable project. That is the foundation for pretty much everything else in this repo.
