@@ -2,7 +2,7 @@
 
 This repo was the editable side of my `War-Torn` modding setup.
 
-The extracted game files in `War-Torn_decomp` are still useful, but they are cooked game content and kind of miserable to treat like a real source project. This repo is the part that was actually meant to be worked in: maps, Blueprint mods, helper scripts, notes, and random UE4SS experiments.
+The decompiled game files are still useful, but they are cooked game content and kind of miserable to treat like a real source project. This repo is the part that was actually meant to be worked in: maps, Blueprint mods, helper scripts, notes, and random UE4SS experiments.
 
 If you just want the practical modding workflow, start with [Docs/ModMaking.md](Docs/ModMaking.md).
 
@@ -16,24 +16,15 @@ I have other stuff to do and I do not really have the interest to keep pushing t
 - a base for anyone who wants to keep experimenting with maps, Blueprint mods, or UE4SS tooling
 - a record of what already worked, what partly worked, and what turned out to be unstable
 
-So no, I would not treat this like an actively maintained toolkit anymore. But I still think it is useful enough to keep around in case someone wants to pick it up later.
+I wouldn't treat this as an actively maintained toolkit/idea anymore. But I still think it is useful enough to keep around in case someone wants to pick it up later.
 
 ## Current State
 
-Right now this repo is best at:
-
-- map work in an editable `UE 4.27` project
-- cooked Blueprint logic mods loaded through `BPModLoader`
-- reverse-engineering notes pulled from live actor dumps and extracted assets
-- small UE4SS helper mods for debugging and command experiments
+It's useful for debugging, it has the support/mods to run commands from the admin menu.
 
 What is still rough:
 
-- custom vehicle spawning
-- some console-hook experiments
-- anything that depends on War-Torn's private runtime flow instead of plain cooked content
-
-Short version: maps and Blueprint logic are the parts I would trust the most. Vehicle and runtime tooling is still very much "I was figuring this out as I went."
+ - almost everything
 
 ## What Is In Here
 
@@ -50,7 +41,7 @@ Short version: maps and Blueprint logic are the parts I would trust the most. Ve
 
 ## What You Need Installed
 
-This is the tool stack the repo expects:
+This is the toolstack the repo expects:
 
 - `Unreal Engine 4.27`
 - `UE4SS`
@@ -147,7 +138,7 @@ These come from the bundled helper mods and are handy while testing:
 - `Ctrl+F7`
   - inspect the actor under your crosshair
 
-## Day-To-Day Commands
+## Most useful post-install commands
 
 Open the editor:
 
@@ -189,26 +180,26 @@ Watch runtime logs:
 
 ## Recommended Reading Order
 
-If you are new to the repo, this is the order I would actually read things:
+If you are new to the repo, this is the order I would read things:
 
 1. [Docs/ModMaking.md](Docs/ModMaking.md)
 2. [Docs/WTSpawnTest-Guide.md](Docs/WTSpawnTest-Guide.md)
 3. [Docs/UE4SS-FirstRun.md](Docs/UE4SS-FirstRun.md)
-4. [Docs/WarTorn-Reference.md](Docs/WarTorn-Reference.md)
-5. [Docs/ActorDump-Analysis.md](Docs/ActorDump-Analysis.md)
+4. [Docs/WarTorn-Reference.md](Docs/WarTorn-Reference.md) very technical
+5. [Docs/ActorDump-Analysis.md](Docs/ActorDump-Analysis.md) very technical
 6. [Docs/WTConsoleTools-Guide.md](Docs/WTConsoleTools-Guide.md)
 
-## Honest Notes
+## Notes
 
 A few honest expectations:
 
 - New maps are realistic.
 - Blueprint logic mods are realistic.
-- Vehicle variants are possible, but the runtime side is still messy.
+- Vehicle variants are possible, but the runtime side is not implemented messy. (the spawning isn't working)
 - A true "brand new game mode" is much harder than it sounds.
 - The extracted game files are reference material, not a complete editable source tree.
 
-This repo can still help someone, but it is not a clean SDK and it definitely is not finished.
+This repo can still help someone, but it is not a clean modkit/SDK and it definitely is not finished.
 
 ## If You Want To Continue It
 
@@ -220,7 +211,7 @@ If somebody else ends up continuing this, this is where I would start:
 4. focus on maps and Blueprint logic first
 5. leave vehicle spawning and deeper runtime hooks for last
 
-The repo makes more sense as a reference base than as a finished framework. If you do keep going with it, I think the best approach is to tighten one path at a time instead of trying to "fix the whole modkit" in one swing.
+The repo makes more sense as a reference base than anything else. If you do keep going with it, I think the best approach is to tighten one path at a time.
 
 
-NB! A bunch of code was written or improved by AI, the dumps and some other stuff was also written and analyzed by AI.
+## NB! A bunch of code was written or improved by AI, the dumps and some other stuff was also written and analyzed by AI.
