@@ -14,7 +14,7 @@ If `WTSpawnTest` works, you know:
 - the `ModActor` made it into the live world
 - your Blueprint logic is actually running
 
-For a very small mod, it clears up a surprising amount of uncertainty.
+For a very small mod, it's useful.
 
 ## Files involved
 
@@ -142,4 +142,4 @@ Once `WTSpawnTest` is reliable, I would not immediately make it bigger. The bett
 - spawn helper actors from Blueprint
 - prototype simple rules or world-side logic
 
-That is the point where it stops being a smoke test and starts being the base for a real mod.
+That is the point where it stops being a smoke test and starts being the base for a real test mod.
