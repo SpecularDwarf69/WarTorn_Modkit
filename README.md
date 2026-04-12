@@ -1,12 +1,13 @@
 # WarTorn ModKit
 
-This repo was the editable side of my `War-Torn` modding setup. It was made for War-Torn v35.9. I don't know if later versions work with it.
+This repo was the editable side of my `War-Torn` modding setup.
 
 The decompiled game files are still useful, but they are cooked game content and kind of miserable to treat like a real source project. This repo is the part that was actually meant to be worked in: maps, Blueprint mods, helper scripts, notes, and random UE4SS experiments.
 
 If you just want the practical modding workflow, start with [Docs/ModMaking.md](Docs/ModMaking.md).
 
 The game and download is [here](https://kingoftheend.itch.io/war-torn).
+It was made for War-Torn v35.9. I don't know if later versions work with it.
 
 ## Project Status
 
